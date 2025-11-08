@@ -1,0 +1,10 @@
+polarix_admin:
+	username : 14vimal2
+	email : 14vimal2@gmail.com
+	password : polarix_password
+
+polarix_user:
+	user1:
+		username : test_user_1
+		email : test.user.1@polarix.com
+		password : test_user_1_pwd
