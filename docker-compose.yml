@@ -1,0 +1,73 @@
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432" # optional: only if you want to connect via psql locally
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.2
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_URL: http://localhost:8081
+      KC_HOSTNAME_ADMIN_URL: http://localhost:8081
+
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+
+      # Optional: Enable metrics, logging, etc.
+      # KC_LOG_LEVEL: INFO
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./data/import:/opt/keycloak/data/import
+    ports:
+      - "8081:8080" # Keycloak UI: http://localhost:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/polarix_db
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ISSUER_URI: http://localhost:8081/realms/polarix
+      KEYCLOAK_SERVER_URL: http://keycloak:8081
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - keycloak
+  
+  verdaccio:
+    image: verdaccio/verdaccio:5
+    ports:
+      - "4873:4873"
+    volumes:
+      - ./verdaccio/conf:/verdaccio/conf
+      - ./verdaccio/storage:/verdaccio/storage
+      - ./verdaccio/plugins:/verdaccio/plugins
+
+volumes:
+  postgres_data:

@@ -1,0 +1,46 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 5173",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint",
+    "generate:api": "openapi-generator-cli generate -i http://localhost:8080/v3/api-docs -g typescript-fetch -o ./src/lib/api-client --skip-validate-spec",
+    "generate:zod": "openapi-zod-client http://localhost:8080/v3/api-docs -o ./src/lib/schemas/generated.ts --export-schemas",
+    "generate:all": "concurrently \"bun run generate:api\" \"bun run generate:zod\"",
+    "prebuild": "bun run generate:all",
+    "predev": "bun run generate:all"
+  },
+  "dependencies": {
+    "@polarix/ui": "^1.0.38",
+    "@radix-ui/react-icons": "^1.3.2",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-query-devtools": "^5.90.2",
+    "ajv": "^8.17.1",
+    "ajv-draft-04": "^1.0.0",
+    "concurrently": "^9.2.1",
+    "keycloak-js": "^26.2.0",
+    "next": "15.5.4",
+    "next-themes": "^0.4.6",
+    "nuqs": "^2.7.0",
+    "openapi-zod-client": "^1.18.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.1.11",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@openapitools/openapi-generator-cli": "^2.23.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

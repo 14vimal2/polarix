@@ -1,0 +1,85 @@
+{
+  "name": "@polarix/ui",
+  "version": "1.0.13",
+  "description": "UI component library for internal projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./form-builder": {
+      "import": "./dist/form-builder/index.js",
+      "types": "./dist/form-builder/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components/ui/index.js",
+      "types": "./dist/components/ui/index.d.ts"
+    },
+    "./styles.css": {
+      "import": "./dist/styles.css"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:types",
+    "build:types": "tsc",
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "typescript",
+    "internal"
+  ],
+  "author": "Polarix Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "@radix-ui/react-checkbox": "^1.0.0",
+    "@radix-ui/react-label": "^2.0.0",
+    "@radix-ui/react-popover": "^1.0.0",
+    "@radix-ui/react-radio-group": "^1.0.0",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.20",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.0.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "@radix-ui/react-checkbox": "^1.0.0",
+    "@radix-ui/react-label": "^2.0.0",
+    "@radix-ui/react-popover": "^1.0.0",
+    "@radix-ui/react-radio-group": "^1.0.0",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.542.0",
+    "react-day-picker": "^9.9.0",
+    "react-hook-form": "^7.62.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.3.8",
+    "zod": "^4.1.5"
+  }
+}

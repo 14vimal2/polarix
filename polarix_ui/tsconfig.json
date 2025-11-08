@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    /* ===== File Layout ===== */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* ===== Path aliases ===== */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+    },
+
+    /* ===== Environment Settings ===== */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+
+    /* ===== Type Declarations ===== */
+    "types": [], 
+    "declaration": true,
+    "declarationMap": true,
+
+    /* ===== Output Maps ===== */
+    "sourceMap": true,
+
+    /* ===== Strict Type Checking ===== */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* ===== React Support (if building UI) ===== */
+    "jsx": "react-jsx",
+
+    /* ===== Modern Module Behavior ===== */
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noUncheckedSideEffectImports": true,
+
+    /* ===== Compatibility ===== */
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
