@@ -1,0 +1,8 @@
+{
+    "name": "polarix-monorepo",
+    "private": true,
+    "workspaces": [
+      "frontend",
+      "polarix_ui"
+    ]
+  }
