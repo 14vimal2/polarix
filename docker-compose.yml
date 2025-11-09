@@ -1,7 +1,18 @@
+networks:
+  polarix-network:
+    driver: bridge
 
 services:
+  # This service is only for generating the bun.lock file reliably.
+  dependency-builder:
+    image: oven/bun:1-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bun install
   postgres:
     image: postgres:13
+    container_name: postgres
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -10,64 +21,88 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432" # optional: only if you want to connect via psql locally
+      - "5432:5432"
+    networks:
+      - polarix-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.4.2
+    container_name: keycloak
+    command:
+      - start-dev
+      - --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: password
-
       KC_HOSTNAME: localhost
-      KC_HOSTNAME_URL: http://localhost:8081
-      KC_HOSTNAME_ADMIN_URL: http://localhost:8081
-
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
-
-      # Optional: Enable metrics, logging, etc.
-      # KC_LOG_LEVEL: INFO
-    command:
-      - start-dev
-      - --import-realm
     volumes:
       - ./data/import:/opt/keycloak/data/import
     ports:
-      - "8081:8080" # Keycloak UI: http://localhost:8081
+      - "8081:8080"
+    networks:
+      - polarix-network
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/8080'"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   backend:
     build: ./backend
+    container_name: backend
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/polarix_db
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_ISSUER_URI: http://localhost:8081/realms/polarix
-      KEYCLOAK_SERVER_URL: http://keycloak:8081
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/polarix
+      KEYCLOAK_SERVER_URL: http://keycloak:8080
     ports:
       - "8080:8080"
+    networks:
+      - polarix-network
     depends_on:
-      - postgres
-      - keycloak
-  
-  verdaccio:
-    image: verdaccio/verdaccio:5
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v3/api-docs"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Use localhost because the build will use the host's network
+        API_URL: http://localhost:8080/v3/api-docs
+      # Use host networking for the build to bypass the BuildKit networking issue
+      network: host
+    container_name: frontend
     ports:
-      - "4873:4873"
-    volumes:
-      - ./verdaccio/conf:/verdaccio/conf
-      - ./verdaccio/storage:/verdaccio/storage
-      - ./verdaccio/plugins:/verdaccio/plugins
+      - "5173:5173"
+    # The final running container will correctly use the isolated bridge network
+    networks:
+      - polarix-network
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:

@@ -1,70 +1,71 @@
-# Polarix
+## Local Development with Docker Compose
 
-Polarix is a full-stack web application featuring a Java-based backend and a Next.js frontend, containerized with Docker for easy setup and deployment.
+This project is configured as a monorepo using Bun workspaces. The entire application stack is managed by Docker Compose for a consistent and reliable development environment.
 
-## Table of Contents
+**Prerequisites:**
 
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
+*   Docker & Docker Compose
+*   Bun (for local UI library development)
 
-## Technology Stack
+### First-Time Setup
 
-- **Backend**: Java, Spring Boot
-- **Frontend**: Next.js, React, TypeScript
-- **UI Library**: `@polarix/ui` (Internal component library)
-- **Database**: PostgreSQL
-- **Authentication**: Keycloak
-- **Containerization**: Docker, Docker Compose
+There are two one-time steps to prepare your environment.
 
-## Project Structure
+1.  **Generate Lockfile and Install Dependencies:**
+    This command uses a Docker container to ensure the `bun.lock` file is created in a consistent environment, preventing dependency issues. It will also install dependencies into your local `node_modules` directory.
+    ```bash
+    docker compose run --rm dependency-builder
+    ```
 
-The repository is organized into the following main directories:
+2.  **Build the Frontend Docker Image:**
+    The frontend requires the `backend` service to be running to generate its API client. This script automates that process.
+    ```bash
+    ./build-frontend.sh
+    ```
 
-- `backend/`: Contains the Java/Spring Boot backend application.
-- `frontend/`: Contains the Next.js frontend application.
-- `polarix_ui/`: A dedicated UI component library for internal use.
-- `data/`: Contains data scripts, including Keycloak realm configurations.
-- `postgres-init/`: Initialization scripts for the PostgreSQL database.
-- `docker-compose.yml`: Defines the services, networks, and volumes for the Docker application.
+### Daily Development Workflow
 
-## Getting Started
+*   **To start the entire application:**
+    ```bash
+    docker compose up
+    ```
+    This will start `postgres`, `keycloak`, `backend`, and the pre-built `frontend`.
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+*   **To stop the application:**
+    ```bash
+    docker compose down
+    ```
 
-### Prerequisites
+*   **Access the services:**
+    *   Frontend: `http://localhost:5173`
+    *   Backend: `http://localhost:8080`
+    *   Keycloak: `http://localhost:8081`
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-- [Java](https://www.oracle.com/java/technologies/downloads/) (for running backend outside of docker)
-- [Node.js](https://nodejs.org/en/download/) (for running frontend outside of docker)
+---
 
-### Installation
+### UI Library (`@polarix/ui`) Development
 
-1.  **Clone the repository**
-    
-    git clone <repository-url>
-    cd polarix
-    2.  **Build and run with Docker Compose**
+If you make changes to the UI library, you need to rebuild it and then rebuild the frontend Docker image to see those changes reflected in the application.
 
-    From the root directory, run the following command to build and start all the services defined in `docker-compose.yml`:
-    
-    docker-compose up --build
-        This will start the backend, frontend, database, and other services in their respective Docker containers.
+1.  **Rebuild the UI library:**
+    From the project's root directory, run the build command for the `@polarix/ui` package:
+    ```bash
+    bun run --filter @polarix/ui build
+    ```
 
-## Usage
+2.  **Re-generate the lockfile:**
+    After rebuilding the library, it's a good practice to regenerate the lockfile to ensure all dependencies are consistent.
+    ```bash
+    docker compose run --rm dependency-builder
+    ```
 
-Once the services are running, you can access the application:
+3.  **Rebuild the frontend image:**
+    Run the build script again. It will use the newly built UI library files and the updated lockfile.
+    ```bash
+    ./build-frontend.sh
+    ```
 
--   **Frontend**: Open your browser and navigate to `http://localhost:5173`
--   **Backend API**: The API should be accessible at `http://localhost:8080`
-
-## Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+4.  **Restart the application:**
+    ```bash
+    docker compose up
+    ```
