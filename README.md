@@ -6,6 +6,9 @@ This project is configured as a monorepo using Bun workspaces. The entire applic
 
 *   Docker & Docker Compose
 *   Bun (for local UI library development)
+*   An entry in your hosts file to map `polarix.localhost` to `127.0.0.1`.
+    *   **On Linux/macOS:** Add `127.0.0.1 polarix.localhost` to your `/etc/hosts` file.
+    *   **On Windows:** Add `127.0.0.1 polarix.localhost` to `C:\Windows\System32\drivers\etc\hosts`.
 
 ### First-Time Setup
 
@@ -37,9 +40,9 @@ There are two one-time steps to prepare your environment.
     ```
 
 *   **Access the services:**
-    *   Frontend: `http://localhost:5173`
-    *   Backend: `http://localhost:8080`
-    *   Keycloak: `http://localhost:8081`
+    *   Frontend: `http://polarix.localhost:5173`
+    *   Backend: `http://polarix.localhost:8080`
+    *   Keycloak: `http://polarix.localhost:8081` (Login with `admin`/`admin`)
 
 ---
 

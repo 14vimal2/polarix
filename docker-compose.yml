@@ -42,15 +42,18 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: password
-      KC_HOSTNAME: localhost
-      KC_HTTP_ENABLED: "true"
+
+      KC_HOSTNAME: polarix.localhost
       KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
     volumes:
       - ./data/import:/opt/keycloak/data/import
     ports:
       - "8081:8080"
     networks:
       - polarix-network
+    extra_hosts:
+      - "polarix.localhost:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,12 +71,17 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/polarix_db
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/polarix
-      KEYCLOAK_SERVER_URL: http://keycloak:8080
+
+      # 👇 FIXED: MUST MATCH REAL ISSUER (KC_HOSTNAME + EXTERNAL PORT)
+      KEYCLOAK_ISSUER_URI: http://polarix.localhost:8081/realms/polarix
+      KEYCLOAK_SERVER_URL: http://polarix.localhost:8081
+      KEYCLOAK_JWKS_URI: http://polarix.localhost:8081/realms/polarix/protocol/openid-connect/certs
     ports:
       - "8080:8080"
     networks:
       - polarix-network
+    extra_hosts:
+      - "polarix.localhost:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,16 +98,15 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        # Use localhost because the build will use the host's network
-        API_URL: http://localhost:8080/v3/api-docs
-      # Use host networking for the build to bypass the BuildKit networking issue
+        API_URL: http://polarix.localhost:8080/v3/api-docs
       network: host
     container_name: frontend
     ports:
       - "5173:5173"
-    # The final running container will correctly use the isolated bridge network
     networks:
       - polarix-network
+    extra_hosts:
+      - "polarix.localhost:host-gateway"
     depends_on:
       backend:
         condition: service_healthy
