@@ -27,7 +27,7 @@ function SkeletonLoader() {
       </header>
       <main className="flex-1">
         <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-          <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+          <div className="container w-full flex flex-col items-center gap-4 text-center">
             <Skeleton className="h-12 w-3/4" />
             <Skeleton className="mt-4 h-6 w-1/2" />
             <Skeleton className="mt-2 h-6 w-2/3" />
@@ -86,11 +86,11 @@ export default function MarketingPage() {
         </header>
         <div className="flex-1">
           <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-            <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+            <div className="container flex max-w-5xl flex-col items-center gap-4 text-center">
               <h1 className="font-heading text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
                 Where Society Meets Strategy
               </h1>
-              <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+              <p className="max-w-2xl leading-normal text-muted-foreground sm:text-xl sm:leading-8">
                 Polarix is the ultimate platform for teams that want to combine
                 seamless project management with dynamic social collaboration.
               </p>
@@ -108,7 +108,7 @@ export default function MarketingPage() {
             id="features"
             className="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24"
           >
-            <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+            <div className="mx-auto flex max-w-232 flex-col items-center space-y-4 text-center">
               <h2 className="font-heading text-3xl font-bold leading-[1.1] sm:text-3xl md:text-6xl">
                 Features
               </h2>
@@ -117,7 +117,7 @@ export default function MarketingPage() {
                 collaboration.
               </p>
             </div>
-            <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+            <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-5xl md:grid-cols-3">
               <Card>
                 <CardHeader>
                   <CardTitle>Collaborative Projects</CardTitle>
@@ -187,7 +187,7 @@ export default function MarketingPage() {
             </div>
           </section>
           <section className="container py-8 md:py-12 lg:py-24">
-            <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
+            <div className="mx-auto flex max-w-232 flex-col items-center justify-center gap-4 text-center">
               <h2 className="font-heading text-3xl font-bold leading-[1.1] sm:text-3xl md:text-6xl">
                 Start Your Journey with Polarix
               </h2>

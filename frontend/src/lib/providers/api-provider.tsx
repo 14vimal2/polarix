@@ -1,6 +1,12 @@
 "use client";
 
-import { Configuration, UserApi } from "@/lib/api-client";
+import {
+  Configuration,
+  UserApi,
+  PermissionsModulesApi,
+  PermissionsRolesApi,
+  PermissionsScopesApi,
+} from "@/lib/api-client";
 import { BASE_PATH } from "@/lib/api-client/runtime";
 import type { Middleware } from "@/lib/api-client/runtime";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,11 +14,14 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import React, { createContext, useContext, useMemo } from "react";
 import { useAuth } from "./auth-provider";
 
-// Create a client
 const queryClient = new QueryClient();
 
+// 1. Add the new API clients to the context interface
 interface IApiContext {
   userApi: UserApi;
+  permissionsModules: PermissionsModulesApi;
+  permissionsRoles: PermissionsRolesApi;
+  permissionsScopes: PermissionsScopesApi;
 }
 
 const ApiContext = createContext<IApiContext | null>(null);
@@ -28,7 +37,8 @@ export const useApi = () => {
 export function ApiProvider({ children }: { children: React.ReactNode }) {
   const { keycloak } = useAuth();
 
-  const userApi = useMemo(() => {
+  // 2. Create all API clients in a single memoized object
+  const apiClients = useMemo(() => {
     const middleware: Middleware[] = [
       {
         async pre(context) {
@@ -36,7 +46,6 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
             await keycloak.updateToken(30);
           } catch (error) {
             console.error("Failed to refresh token", error);
-            // Fallback to login if token refresh fails
             keycloak.login();
           }
 
@@ -56,11 +65,19 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
       basePath: BASE_PATH,
       middleware,
     });
-    return new UserApi(apiConfig);
+    
+    // Instantiate all clients with the same configuration
+    return {
+      userApi: new UserApi(apiConfig),
+      permissionsModules: new PermissionsModulesApi(apiConfig),
+      permissionsRoles: new PermissionsRolesApi(apiConfig),
+      permissionsScopes: new PermissionsScopesApi(apiConfig),
+    };
   }, [keycloak]);
 
   return (
-    <ApiContext.Provider value={{ userApi }}>
+    // 3. Provide all the clients in the context value
+    <ApiContext.Provider value={apiClients}>
       <QueryClientProvider client={queryClient}>
         {children}
         <ReactQueryDevtools initialIsOpen={false} />
